@@ -211,7 +211,7 @@ function setActions(json) {
 	main.appendChild(actions)
 }
 
-const JSON_URL = "https://api.myjson.com/bins/c70tf"
+const JSON_URL = "https://api.myjson.com/bins/mbe3n"
 
 fetch(JSON_URL).then(res => {
 	res.json().then(json => {
