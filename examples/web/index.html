@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Example of channels of web sockets</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <section class="error-msg">
+    </section>
+
+    <section class="create-member">
+        <form method="dialog">
+            <input type="text" id="username-connect" placeholder="Type your username">
+            <button onclick="connectMember()">Create member</button>
+        </form>
+    </section>
+
+    <section class="room">
+        <div>
+            <header>
+                <h5>Your username: <span id="my-username"></span></h5>
+                <h5>Your ID: <span id="my-id"></span></h5>
+                <h5>Room ID: <span id="id-room"></span></h5>
+                <h5>The room is <span id="is-locked"></span></h5>
+            </header>
+            <div class="members">
+            </div>
+            <p class="message"></p>
+        </div>
+
+        <div class="buttons">
+            <input type="number" id="id-room-input" placeholder="Set the ID of the room">
+            <button onclick="joinRoom()">Join room</button>
+        </div>
+        <div class="buttons">
+            <button onclick="createRoom()">Create room</button>
+            <button onclick="leaveRoom()">Leave room</button>
+            <button onclick="lockRoom()">Lock room</button>
+        </div>
+    </section>
+
+
+    <script src="./js/ws.js"></script>
+    <script src="./js/actions.js"></script>
+    <script src="./js/index.js"></script>
+</body>
+
+</html>

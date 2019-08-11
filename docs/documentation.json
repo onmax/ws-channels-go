@@ -1,0 +1,613 @@
+{
+	"title": "Documentation - Channels using Web Socket",
+	"description": "<p>In this document it is explain how my implementation of channels using web sockets in golang works. You can see the source code in this <a href='github.com'>link</a>. If you want to contribute or give me some advice you can submit an issue using this <a href>link</a></p><p>The system has only one room in the beginning. This rooms has the ID=1 and in the source code and in this documentation is known as lobby. After making the connection via WebSocket the user must send first a request with an username. The request is explain <a href='#connect'>here</a>. After that, the member can use the rest of actions as he/she wishes</p><p>It is a websocket server, so a request implies a response that can be: unicast (data sent to the user who requested the action), multicast (data sent to a group of users) or broadcast (data sent to all users of the system ). In this project, only unicast and multicast are used for now.</p><p>For now, a member can only be in one room at the time. In the future, this behavior may change and different options will be available.</p><p>The purpose of this project, is to allow me to have a websocket server for further projects that I will make using Flutter.</p>",
+	"project_url": "https://github.com/onmax/ws-channels-go",
+	"actions": [
+		{
+			"name": "Create member",
+			"description": "It creates a new member. This action is the first that the users must use. The response of the request has all the information needed for the rest of the actions: username and id.",
+			"request": "connect",
+			"response_ok": "create-member-successfully",
+			"response_error": [
+				"username-not-specified",
+				"username-already-taken"
+			]
+		},
+		{
+			"name": "Create room",
+			"description": "It creates a new room. The user who requested will be moved automatically. The response of the request has all the information needed: id, members, is_locked and master.",
+			"request": "create_room",
+			"response_ok": "create-room-successfully",
+			"response_error": [
+				"member-not-found__create",
+				"member-not-found__move-member",
+				"room-not-found__move-member"
+			]
+		},
+		{
+			"name": "Join room",
+			"description": "The member who requested the action will be moved to the room that requested if the room has not been locked. The response of the request has all the information needed: id, members, is_locked and master.",
+			"request": "join_room",
+			"response_ok": "join-room-successfully",
+			"response_error": [
+				"member-not-found__join",
+				"room-not-found__join",
+				"room-is-locked",
+				"member-not-found__move-member",
+				"room-not-found__move-member"
+			]
+		},
+		{
+			"name": "Leave room",
+			"description": "The member who requested the action will be moved to the lobby. If the member who requested the action is the master of the room, other member will be chosen randomly to become the master.",
+			"request": "leave_room",
+			"response_ok": "leave-room-successfully",
+			"response_error": [
+				"room-not-found__2",
+				"member-not-found__2",
+				"member-not-found__move-member",
+				"room-not-found__move-member"
+			]
+		},
+		{
+			"name": "Lock room",
+			"description": "The room will be locked so anyone else can't join. Only the master of the room can lock the room.",
+			"request": "lock_room",
+			"response_ok": "lock-room-successfully",
+			"response_error": [
+				"room-not-found__2",
+				"member-not-found__2",
+				"member-not-found__move-member",
+				"room-not-found__move-member"
+			]
+		}
+	],
+	"requests": {
+		"connect": {
+			"example": {
+				"action": "connect",
+				"member": {
+					"username": "hulk"
+				}
+			},
+			"details": [
+				{
+					"key": "action",
+					"description": "Action that will be executed. In this case, it will be 'connect'.",
+					"mandatory": true
+				},
+				{
+					"key": "member",
+					"description": "Information that the user specifies to register a new member. Username must be unique.",
+					"mandatory": true
+				}
+			]
+		},
+		"create_room": {
+			"example": {
+				"action": "create",
+				"member": {
+					"username": "hulk",
+					"id": 2
+				}
+			},
+			"details": [
+				{
+					"key": "action",
+					"description": "Action that will be executed. In this case, it will be 'create'.",
+					"mandatory": true
+				},
+				{
+					"key": "member",
+					"description": "Information of the member who is going to request the action. Username must be registered using the action 'connect' that returns the ID needed as well. Username and ID for member must be set.",
+					"mandatory": true
+				}
+			]
+		},
+		"join_room": {
+			"example": {
+				"action": "join",
+				"member": {
+					"username": "hulk",
+					"id": 2
+				},
+				"room": {
+					"id": 2
+				}
+			},
+			"details": [
+				{
+					"key": "action",
+					"description": "Action that will be executed. In this case, it will be 'join'.",
+					"mandatory": true
+				},
+				{
+					"key": "member",
+					"description": "Information of the member who is going to request the action. Username must be registered using the action 'connect' that returns the ID needed as well. Username and ID for member must be set.",
+					"mandatory": true
+				},
+				{
+					"key": "room",
+					"description": "Information of room where the member will join. Room needs to exists. Only ID is necessary.",
+					"mandatory": true
+				}
+			]
+		},
+		"leave_room": {
+			"example": {
+				"action": "leave",
+				"member": {
+					"username": "hulk",
+					"id": 2
+				},
+				"room": {
+					"id": 2
+				}
+			},
+			"details": [
+				{
+					"key": "action",
+					"description": "Action that will be executed. In this case, it will be 'leave'.",
+					"mandatory": true
+				},
+				{
+					"key": "member",
+					"description": "Information of the member who is going to request the action. Username must be registered using the action 'connect' that returns the ID needed as well. Username and ID for member must be set. The member must be in the room. Member cannot leave lobby room, which is ID=1.",
+					"mandatory": true
+				},
+				{
+					"key": "room",
+					"description": "It must have an ID of the room where the member belongs.",
+					"mandatory": true
+				}
+			]
+		},
+		"lock_room": {
+			"example": {
+				"action": "lock",
+				"member": {
+					"username": "hulk",
+					"id": 2
+				},
+				"room": {
+					"id": 2
+				}
+			},
+			"details": [
+				{
+					"key": "action",
+					"description": "Action that will be executed. In this case, it will be 'lock'.",
+					"mandatory": true
+				},
+				{
+					"key": "member",
+					"description": "Information of the member who is going to request the action. Username must be registered using the action 'connect' that returns the ID needed as well. Username and ID for member must be set. The member must be in the room and the member has to be the master of the room.",
+					"mandatory": true
+				},
+				{
+					"key": "room",
+					"description": "It must have an ID of the room which will be locked.",
+					"mandatory": true
+				}
+			]
+		}
+	},
+	"responses": {
+		"username-not-specified": {
+			"example": {
+				"code": 1,
+				"message": "You need to specify an Username"
+			},
+			"detail": {
+				"reason": "You need to specified an username correctly. Empty strings are not allowed.",
+				"target": "Unicast to the member who requested the action"
+			}
+		},
+		"username-already-taken": {
+			"example": {
+				"code": 2,
+				"message": "Username spider-man has already been taken"
+			},
+			"detail": {
+				"reason": "Username has already been taken. You must change your username.",
+				"target": "Unicast to the member who requested the action"
+			}
+		},
+		"create-member-successfully": [
+			{
+				"example": {
+					"code": 3,
+					"message": "Hulk has joined the lobby",
+					"room": {
+						"id": 1,
+						"is_locked": false,
+						"members": [
+							{
+								"id": 1,
+								"username": "iron-man"
+							},
+							{
+								"id": 2,
+								"username": "hulk"
+							}
+						],
+						"master": 0
+					},
+					"member": {
+						"id": 2,
+						"username": "hulk"
+					}
+				},
+				"detail": {
+					"reason": "Member has been created successfully.",
+					"target": "Multicast to all the members of the lobby"
+				}
+			}
+		],
+		"member-not-found__create": {
+			"example": {
+				"code": 201,
+				"message": "Member not found"
+			},
+			"detail": {
+				"reason": "You need to specified a member that is already in the lobby or in other room. If member is not created, you must create it using 'connect'",
+				"target": "Unicast to the member who requested the action"
+			}
+		},
+		"member-not-found__move-member": {
+			"example": {
+				"code": 75,
+				"message": "Member not found"
+			},
+			"detail": {
+				"reason": "Something happened moving the user. You need to make the request again.",
+				"target": "Unicast to the member who requested the action"
+			}
+		},
+		"room-not-found__move-member": {
+			"example": {
+				"code": 76,
+				"message": "Room not found"
+			},
+			"detail": {
+				"reason": "The room doesn't exists.",
+				"target": "Unicast to the member who requested the action"
+			}
+		},
+		"member-already-in-room-member": {
+			"example": {
+				"code": 77,
+				"message": "Member is already in the room"
+			},
+			"detail": {
+				"reason": "Member is already in the room",
+				"target": "Unicast to the member who requested the action"
+			}
+		},
+		"create-room-successfully": [
+			{
+				"example": {
+					"code": 51,
+					"message": "Hulk has joined the room",
+					"room": {
+						"id": 2,
+						"is_locked": false,
+						"members": [
+							{
+								"id": 2,
+								"username": "hulk"
+							}
+						],
+						"master": 2
+					},
+					"member": {
+						"id": 2,
+						"username": "hulk"
+					}
+				},
+				"detail": {
+					"reason": "Room has been created successfully and the member who requested has joined the room.",
+					"target_title": "Destination room",
+					"target": "Multicast to all the members of the new room."
+				}
+			},
+			{
+				"example": {
+					"code": 52,
+					"message": "Hulk has left the room",
+					"room": {
+						"id": 2,
+						"is_locked": false,
+						"members": [
+							{
+								"id": 1,
+								"username": "iron-man"
+							}
+						],
+						"master": 0
+					},
+					"member": {
+						"id": 2,
+						"username": "hulk"
+					}
+				},
+				"detail": {
+					"reason": "Room has been created successfully and the member who requested has left the room",
+					"target_title": "Origin room",
+					"target": "Multicast to all the members of the room where the member who requested the action was before."
+				}
+			}
+		],
+		"member-not-found__join": {
+			"example": {
+				"code": 301,
+				"message": "Member not found"
+			},
+			"detail": {
+				"reason": "You need to specified a member that is already in the lobby or in other room. If member is not created, you must create it using 'connect'",
+				"target": "Unicast to the member who requested the action"
+			}
+		},
+		"room-not-found__join": {
+			"example": {
+				"code": 302,
+				"message": "Room not found"
+			},
+			"detail": {
+				"reason": "You need to specified a room where the member is going to join. Room must exists.",
+				"target": "Unicast to the member who requested the action"
+			}
+		},
+		"room-is-locked": {
+			"example": {
+				"code": 303,
+				"message": "The room is locked"
+			},
+			"detail": {
+				"reason": "You cannot join the room. The room is locked.",
+				"target": "Unicast to the member who requested the action"
+			}
+		},
+		"join-room-successfully": [
+			{
+				"example": {
+					"code": 51,
+					"message": "Hulk has joined the room",
+					"room": {
+						"id": 2,
+						"is_locked": false,
+						"members": [
+							{
+								"id": 3,
+								"username": "spiderman"
+							},
+							{
+								"id": 2,
+								"username": "hulk"
+							}
+						],
+						"master": 3
+					},
+					"member": {
+						"id": 2,
+						"username": "hulk"
+					}
+				},
+				"detail": {
+					"reason": "The member who requested the action has joined the room successfully.",
+					"target_title": "Destination room",
+					"target": "Multicast to all the members of the room where the member has joined."
+				}
+			},
+			{
+				"example": {
+					"code": 52,
+					"message": "Hulk has left the room",
+					"room": {
+						"id": 1,
+						"is_locked": false,
+						"members": [
+							{
+								"id": 1,
+								"username": "iron-man"
+							}
+						],
+						"master": 0
+					},
+					"member": {
+						"id": 2,
+						"username": "hulk"
+					}
+				},
+				"detail": {
+					"reason": "he member who requested the action has left the room successfully.",
+					"target_title": "Origin room",
+					"target": "Multicast to all the members of the room where the member has left."
+				}
+			}
+		],
+		"leave-room-successfully": [
+			{
+				"example": {
+					"code": 52,
+					"message": "Hulk has left the room",
+					"room": {
+						"id": 2,
+						"is_locked": false,
+						"members": [
+							{
+								"id": 1,
+								"username": "iron-man"
+							}
+						],
+						"master": 1
+					},
+					"member": {
+						"id": 2,
+						"username": "hulk"
+					}
+				},
+				"detail": {
+					"reason": "he member who requested the action has left the room successfully.",
+					"target_title": "Origin room",
+					"target": "Multicast to all the members of the room where the member has left."
+				}
+			},
+			{
+				"example": {
+					"code": 51,
+					"message": "Hulk has joined the room",
+					"room": {
+						"id": 1,
+						"is_locked": false,
+						"members": [
+							{
+								"id": 3,
+								"username": "spiderman"
+							},
+							{
+								"id": 2,
+								"username": "hulk"
+							}
+						],
+						"master": 0
+					},
+					"member": {
+						"id": 2,
+						"username": "hulk"
+					}
+				},
+				"detail": {
+					"reason": "The member who requested the action has joined the room successfully.",
+					"target_title": "Destination room",
+					"target": "Multicast to all the members of the room where the member has joined."
+				}
+			}
+		],
+		"room-not-found__2": {
+			"example": {
+				"code": 401,
+				"message": "Room not found"
+			},
+			"detail": {
+				"reason": "You need to specified a room where the member is going to join. Room must exists.",
+				"target": "Unicast to the member who requested the action"
+			}
+		},
+		"member-not-found__2": {
+			"example": {
+				"code": 402,
+				"message": "Member not found"
+			},
+			"detail": {
+				"reason": "You need to specified a member that is already in the lobby or in other room. If member is not created, you must create it using 'connect'",
+				"target": "Unicast to the member who requested the action"
+			}
+		},
+		"lock-room-successfully": [
+			{
+				"example": {
+					"code": 404,
+					"message": "The room has been locked",
+					"room": {
+						"id": 2,
+						"is_locked": true,
+						"members": [
+							{
+								"id": 3,
+								"username": "spiderman"
+							},
+							{
+								"id": 2,
+								"username": "hulk"
+							}
+						],
+						"master": 3
+					},
+					"member": {
+						"id": 3,
+						"username": "spiderman"
+					}
+				},
+				"detail": {
+					"reason": "The room has been locked successfully.",
+					"target": "Multicast to all the members of the room that has been locked"
+				}
+			}
+		]
+	},
+	"entities": [
+		{
+			"key": "room",
+			"type": "json",
+			"description": "Information about the room which the user will be taken the action.",
+			"values": [
+				{
+					"key": "id",
+					"type": "int",
+					"description": "Unique identifier for the room",
+					"example": 2,
+					"is-static": false,
+					"mandatory": true
+				},
+				{
+					"key": "members",
+					"type": "array",
+					"description": "List of the current members in the room",
+					"value": {
+						"type": "member"
+					},
+					"is-static": false,
+					"mandatory": true
+				},
+				{
+					"key": "is_locked",
+					"type": "bool",
+					"description": "Boolean to specify if members can join the room",
+					"example": true,
+					"is-static": false,
+					"mandatory": true
+				},
+				{
+					"key": "master",
+					"type": "int",
+					"description": "Identifier with the ID of the member who is the master of the room. The master is the only one who can lock the room. The master must be in the room",
+					"example": 2,
+					"is-static": false,
+					"mandatory": true
+				}
+			]
+		},
+		{
+			"key": "member",
+			"type": "json",
+			"description": "Information about the member who requested an action.",
+			"values": [
+				{
+					"key": "id",
+					"type": "int",
+					"description": "Unique identifier of the member",
+					"example": 2,
+					"is-static": false,
+					"mandatory": true
+				},
+				{
+					"key": "username",
+					"type": "string",
+					"description": "Unique username of the member",
+					"example": "Hulk",
+					"is-static": false,
+					"mandatory": true
+				},
+				{
+					"key": "role",
+					"type": "string",
+					"description": "Role of the member in the room. This will be use in a project.",
+					"example": "citizen",
+					"is-static": false,
+					"mandatory": false
+				}
+			]
+		}
+	]
+}

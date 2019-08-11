@@ -1,0 +1,250 @@
+:root {
+	--aside-bck: #f1f1f6;
+	--color: #232329;
+
+	--primary: #2d304a;
+	--secondary: #626271;
+
+	--code-bck: #eaeaee;
+	--code-border: #707070;
+	--code-color-primary: #25262e;
+	--code-color-secondary: #585858;
+
+	--successful: #23a85d;
+	--error: #e64949;
+
+	--link: #4265b5;
+}
+html,
+body {
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	height: 100%;
+}
+
+body {
+	display: flex;
+	color: var(--color);
+	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+aside {
+	width: 150px;
+	background: var(--aside-bck);
+	padding: 20px;
+	box-shadow: -1px 0px 17px 5px #ccc;
+	position: fixed;
+	height: calc(100% - 40px);
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+aside h2 {
+	text-transform: capitalize;
+	font-size: 20px;
+	margin: 5px 0 0 0;
+}
+
+aside h2 a {
+	text-decoration: none;
+	color: var(--primary);
+}
+
+aside h2:first-child {
+	margin: 0;
+}
+
+footer {
+	font-size: 12px;
+}
+
+header > div p {
+	margin: 10px 0 0 0;
+}
+a {
+	color: var(--link);
+	font-weight: 700;
+}
+
+ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+li {
+	cursor: pointer;
+	color: var(--link);
+	font-weight: 600;
+	margin: 5px;
+}
+
+li:first-child {
+	margin: 2px 5px;
+}
+
+ul li > a {
+	font-weight: 500;
+	font-size: 16px;
+}
+
+main {
+	margin: 0 20px;
+	padding-left: 200px;
+	padding-bottom: 50px;
+	display: flex;
+	flex-direction: column;
+}
+
+h1,
+h3,
+h4 {
+	color: #fff;
+	background: var(--primary);
+	padding: 4px 10px;
+}
+
+h3 {
+	margin: 30px 0 15px 0;
+}
+h4 {
+	background: var(--secondary);
+	margin: 10px 0;
+	margin-top: 30px;
+}
+
+h5 {
+	font-size: 15px;
+	padding: 0 10px;
+	margin: 10px 0 5px 0;
+}
+
+p {
+	padding: 0 10px;
+	margin: 10px 0;
+}
+
+.actions {
+	margin-top: 15px;
+	padding-bottom: 50px;
+}
+
+pre {
+	background: var(--code-bck);
+	color: var(--code-color-primary);
+	font-family: "Source Code Pro", monospace;
+	padding: 15px 25px;
+	margin: 0 10px;
+	border: 1px solid var(--code-border);
+	border-radius: 5px;
+	font-size: 15px;
+}
+
+.details,
+.example {
+	padding-left: 15px;
+	margin-top: 10px;
+}
+
+.example {
+	font-size: 14px;
+	margin-top: 0;
+}
+
+h6 {
+	text-transform: capitalize;
+	margin: 0;
+	font-size: 12px;
+}
+p {
+	margin: 0;
+	font-size: 14px;
+}
+
+.successful-dot,
+.error-dot {
+	width: 10px;
+	height: 10px;
+	background: var(--successful);
+	border-radius: 50%;
+}
+
+.successful-dot {
+	background: var(--successful);
+}
+
+.error-dot {
+	background: var(--error);
+}
+
+.successful-response {
+	margin: 5px 0 30px 0;
+}
+
+.successful-response h5 {
+	font-size: 13px;
+}
+.successful-response h5,
+.successful-response p {
+	margin-left: 15px;
+}
+.successful-response p {
+	margin-bottom: 10px;
+}
+
+.line {
+	display: flex;
+	align-items: center;
+	margin-left: 15px;
+}
+
+.line h6 {
+	margin: 0;
+	margin-left: 10px;
+	font-size: 14px;
+}
+
+.margin-top {
+	margin: 10px 15px;
+}
+
+.err-json {
+	cursor: pointer;
+	margin: 10px;
+	border: 1px solid var(--primary);
+	border-radius: 5px;
+	padding: 7px 20px;
+}
+
+.err-json pre {
+	margin: 0;
+	margin-top: 15px;
+}
+.err-json h6 {
+	margin-bottom: 5px;
+}
+.err-json > div {
+	display: flex;
+	align-items: center;
+}
+
+.error-icon {
+	font-weight: bold;
+	font-size: 18px;
+	padding-bottom: 4px;
+	margin-right: 5px;
+	transition: 0.3s all ease;
+}
+
+.hide pre,
+.hide h6,
+.hide p {
+	overflow: hidden;
+	padding-top: 0;
+	padding-bottom: 0;
+	height: 0;
+	border-width: 0;
+	margin: 0 !important;
+}
