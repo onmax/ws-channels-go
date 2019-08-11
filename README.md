@@ -6,7 +6,7 @@ The purpose of this project, is to allow me to have a websocket server for furth
 
 ## Run the application
 
-You can use the ```Makefile``` and run ```make help``` to see all the option. To run the application using Docker, run:
+You can use the ```Makefile``` and run ```make help``` to see all the options. To run the application using Docker, run:
 
 ```make docker-run```
 
